@@ -265,7 +265,7 @@ class ContactUs(models.Model):
 class Partner(models.Model):
     name = models.CharField(max_length=500, verbose_name='نام همکار')
     description = models.TextField(verbose_name='توضیحات')
-    logo = models.ImageField(upload_to='user/partners/', help_text='این فیلد اختیاری می باشد.', verbose_name='لگو',
+    logo = models.ImageField(upload_to='users/partners/', help_text='این فیلد اختیاری می باشد.', verbose_name='لگو',
                              blank=True, null=True)
     user = models.OneToOneField(to=User, on_delete=models.CASCADE, verbose_name='کاربر', related_name='partner')
 

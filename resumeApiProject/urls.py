@@ -17,8 +17,8 @@ urlpatterns = [
                   path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
                   path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
                   # endregion
-                  # path('blogs/', include('apps.blog.urls')),
-                  # path('account/', include('apps.accounts.urls')),
+                  path('blogs/', include('apps.blog.urls')),
+                  path('account/', include('apps.accounts.urls')),
                   # path('plans/', include('apps.planing.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 admin.site.site_header = 'پنل مدیریت رزومه'

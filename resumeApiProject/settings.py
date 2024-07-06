@@ -136,6 +136,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'apps.utilities.CustomPagination',
+    'PAGE_SIZE': 25,
 }
 
 SIMPLE_JWT = {

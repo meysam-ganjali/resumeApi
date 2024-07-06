@@ -45,20 +45,6 @@ class BlogApiView(APIView):
         return paginator.get_paginated_response(response_formatter(data, status.HTTP_200_OK, 'لیست مقالات'))
 
 
-class BlogDetailBySlugApiView(APIView):
-    @extend_schema(
-        request=BlogSerializer,
-        responses={200: BlogSerializer(many=False)},
-    )
-    def get(self, request, slug: str):
-        try:
-            blog = Blog.objects.get(slug=uri_to_iri(slug))
-            serializer = BlogSerializer(blog, many=False)
-            return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'جزئیات مقاله'))
-        except Blog.DoesNotExist:
-            return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'مقاله یافت نشد'))
-
-
 class BlogDetailByIdApiView(APIView):
     @extend_schema(
         request=BlogSerializer,
