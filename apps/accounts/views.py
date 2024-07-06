@@ -5,13 +5,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from apps.accounts.models import UserEducation, UserWorkExperience, UserSkill, UserWorkSamples, UserRecommendation
+from apps.accounts.models import UserEducation, UserWorkExperience, UserSkill, UserWorkSamples, UserRecommendation, \
+    UserLanguage, UserSocialMedia
 from apps.permission import CheckPermission
 from apps.utilities import response_formatter
 
 from apps.accounts.serializer import UserUpdateSerializer, RegisterSerializer, ActivateUserSerializer, \
     UserEducationSerializer, UserWorkExperienceSerializer, UserSkillSerializer, UserWorkSamplesSerializer, \
-    UserRecommendationSerializer
+    UserRecommendationSerializer, UserLanguageSerializer, UserSocialMediaSerializer
 
 
 class RegisterAPIView(APIView):
@@ -190,7 +191,7 @@ class UpdateUserSkillApiView(APIView):
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
 
 
-class AddUserWorkSamples(APIView):
+class AddUserWorkSamplesApiView(APIView):
     @extend_schema(
         request=UserWorkSamplesSerializer,
         responses={200}
@@ -208,7 +209,7 @@ class AddUserWorkSamples(APIView):
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
 
 
-class UpdateUserWorkSamples(APIView):
+class UpdateUserWorkSamplesApiView(APIView):
     @extend_schema(
         request=UserWorkSamplesSerializer,
         responses={200}
@@ -230,7 +231,7 @@ class UpdateUserWorkSamples(APIView):
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
 
 
-class AddUserRecommendation(APIView):
+class AddUserRecommendationApiView(APIView):
     @extend_schema(
         request=UserRecommendationSerializer,
         responses={200}
@@ -248,7 +249,7 @@ class AddUserRecommendation(APIView):
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
 
 
-class UpdateUserRecommendation(APIView):
+class UpdateUserRecommendationApiView(APIView):
     @extend_schema(
         request=UserRecommendationSerializer,
         responses={200}
@@ -269,3 +270,82 @@ class UpdateUserRecommendation(APIView):
             return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
 
+
+class AddUserLanguageApiView(APIView):
+    @extend_schema(
+        request=UserLanguageSerializer,
+        responses={200}
+    )
+    def post(self, request):
+        permission_classes = [IsAuthenticated, CheckPermission]
+        authentication_classes = JWTAuthentication
+        user = request.user
+        if user and user.is_authenticated:
+            serializer = UserLanguageSerializer(data=request.data, context={'user': user})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'مهارت زبان ایجاد شد.'))
+            return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
+        return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
+
+
+class UpdateUserLanguageApiView(APIView):
+    @extend_schema(
+        request=UserLanguageSerializer,
+        responses={200}
+    )
+    def put(self, request, pk):
+        permission_classes = [IsAuthenticated, CheckPermission]
+        authentication_classes = JWTAuthentication
+        user = request.user
+        if user and user.is_authenticated:
+            try:
+                instance = UserLanguage.objects.get(pk=pk)
+            except UserEducation.DoesNotExist:
+                return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'مهارت زبان یافت نشد.'))
+            serializer = UserLanguageSerializer(instance, data=request.data, context={'user': user})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'مهارت بروزشد.'))
+            return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
+        return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
+
+
+class AddUserSocialMediaApiView(APIView):
+    @extend_schema(
+        request=UserSocialMediaSerializer,
+        responses={200}
+    )
+    def post(self, request):
+        permission_classes = [IsAuthenticated, CheckPermission]
+        authentication_classes = JWTAuthentication
+        user = request.user
+        if user and user.is_authenticated:
+            serializer = UserSocialMediaSerializer(data=request.data, context={'user': user})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'شبکه اجتماعی ایجاد شد.'))
+            return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
+        return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
+
+
+class UpdateUserSocialMediaApiView(APIView):
+    @extend_schema(
+        request=UserLanguageSerializer,
+        responses={200}
+    )
+    def put(self, request, pk):
+        permission_classes = [IsAuthenticated, CheckPermission]
+        authentication_classes = JWTAuthentication
+        user = request.user
+        if user and user.is_authenticated:
+            try:
+                instance = UserSocialMedia.objects.get(pk=pk)
+            except UserEducation.DoesNotExist:
+                return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'شبکه اجتماعی یافت نشد.'))
+            serializer = UserSocialMediaSerializer(instance, data=request.data, context={'user': user})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'شبکه اجتماعی بروزشد.'))
+            return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
+        return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
