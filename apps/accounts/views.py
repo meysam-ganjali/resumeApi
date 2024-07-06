@@ -5,12 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from apps.accounts.models import UserEducation, UserWorkExperience, UserSkill
+from apps.accounts.models import UserEducation, UserWorkExperience, UserSkill, UserWorkSamples
 from apps.permission import CheckPermission
 from apps.utilities import response_formatter
 
 from apps.accounts.serializer import UserUpdateSerializer, RegisterSerializer, ActivateUserSerializer, \
-    UserEducationSerializer, UserWorkExperienceSerializer, UserSkillSerializer
+    UserEducationSerializer, UserWorkExperienceSerializer, UserSkillSerializer, UserWorkSamplesSerializer
 
 
 class RegisterAPIView(APIView):
@@ -185,5 +185,45 @@ class UpdateUserSkillApiView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'مهارت بروزشد.'))
+            return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
+        return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
+
+
+class AddUserWorkSamples(APIView):
+    @extend_schema(
+        request=UserWorkSamplesSerializer,
+        responses={200}
+    )
+    def post(self, request):
+        permission_classes = [IsAuthenticated, CheckPermission]
+        authentication_classes = JWTAuthentication
+        user = request.user
+        if user and user.is_authenticated:
+            serializer = UserWorkSamplesSerializer(data=request.data, context={'user': user})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'نمونه کار ایجاد شد.'))
+            return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
+        return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
+
+
+class UpdateUserWorkSamples(APIView):
+    @extend_schema(
+        request=UserWorkSamplesSerializer,
+        responses={200}
+    )
+    def put(self, request, pk):
+        permission_classes = [IsAuthenticated, CheckPermission]
+        authentication_classes = JWTAuthentication
+        user = request.user
+        if user and user.is_authenticated:
+            try:
+                instance = UserWorkSamples.objects.get(pk=pk)
+            except UserEducation.DoesNotExist:
+                return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'نمونه کار یافت نشد.'))
+            serializer = UserWorkSamplesSerializer(instance, data=request.data, context={'user': user})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'نمونه کار بروزشد.'))
             return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
