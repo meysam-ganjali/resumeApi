@@ -8,7 +8,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.permission import CheckPermission
 from apps.utilities import response_formatter
 
-from apps.accounts.serializer import UserUpdateSerializer, RegisterSerializer
+from apps.accounts.serializer import UserUpdateSerializer, RegisterSerializer, ActivateUserSerializer
 
 
 class RegisterAPIView(APIView):
@@ -47,3 +47,16 @@ class UserUpdateApiView(APIView):
                     response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبار سنجی.'))
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN,
                                            'مجوز برای این بخش صادر نشد.ابتدا وارد حساب کاربری خود شوید.'))
+
+
+class ActivateUserApiView(APIView):
+    @extend_schema(
+        request=ActivateUserSerializer,
+        responses={200}
+    )
+    def post(self, request):
+        serializer = ActivateUserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(response_formatter({}, status.HTTP_200_OK, 'حساب شما با موفقیت فعال شد'))
+        return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))

@@ -83,3 +83,33 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+
+class ActivateUserSerializer(serializers.Serializer):
+    user_phone = serializers.CharField(max_length=15, min_length=11)
+    verification_code = serializers.RegexField(
+        regex=r'^\d{5}$',
+        error_messages={
+            'کد نامعتبر': 'کد فعال سازی باید 5 رقم باشد.'
+        }
+    )
+
+    def validate(self, data):
+        user_phone = data.get('user_phone')
+        verification_code = data.get('verification_code')
+
+        try:
+            user = User.objects.get(user_phone=user_phone)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("کاربر با این شماره یافت نشد.")
+        if user.active_code != verification_code:
+            raise serializers.ValidationError("کد نامعتبر است.")
+
+        return data
+
+    def save(self):
+        user_phone = self.validated_data['user_phone']
+        user = User.objects.get(user_phone=user_phone)
+        user.is_active = True
+        user.save()
+        return user
