@@ -3,7 +3,7 @@ import re
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from .models import User, UserEducation, UserWorkExperience
+from .models import User, UserEducation, UserWorkExperience, UserSkill
 from apps.utilities import generate_code
 
 
@@ -146,6 +146,26 @@ class UserWorkExperienceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['user']
         return UserWorkExperience.objects.create(user=user, **validated_data)
+
+    def update(self, instance, validated_data):
+        user = self.context['user']
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+
+class UserSkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserSkill
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        user = self.context['user']
+        return UserSkill.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
         user = self.context['user']

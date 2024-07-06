@@ -12,4 +12,6 @@ urlpatterns = [
     path('education/<int:pk>/', views.UpdateUserEducationView.as_view(), name='user-education-update'),
     path('workexperience/', views.AddUserWorkExperience.as_view(), name='user-work-experience-create'),
     path('workexperience/<int:pk>/', views.UpdateUserWorkExperience.as_view(), name='user-work-experience-update'),
+    path('skill/', views.AddUserSkillApiView.as_view(), name='user-skill-create'),
+    path('skill/<int:pk>/', views.UpdateUserSkillApiView.as_view(), name='user-skill-update'),
 ]
