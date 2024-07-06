@@ -3,7 +3,7 @@ import re
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from .models import User
+from .models import User, UserEducation, UserWorkExperience
 from apps.utilities import generate_code
 
 
@@ -61,7 +61,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=False, allow_blank=True)
+    age = serializers.IntegerField(required=False)
     gender_class = serializers.ChoiceField(choices=User.GENDER_CHOICES, required=False, allow_blank=True)
     marital_class = serializers.ChoiceField(choices=User.MARITAL_CLASS_CHOICES, required=False, allow_blank=True)
     military_class = serializers.ChoiceField(choices=User.MILITARY_CHOICES, required=False, allow_blank=True)
@@ -75,7 +75,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'gender_class', 'marital_class', 'military_class',
+        fields = ['age', 'gender_class', 'marital_class', 'military_class',
                   'birth_date', 'country', 'city', 'state', 'job', 'requested_salary', 'show_salary']
 
     def update(self, instance, validated_data):
@@ -113,3 +113,43 @@ class ActivateUserSerializer(serializers.Serializer):
         user.is_active = True
         user.save()
         return user
+
+
+class UserEducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserEducation
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        user = self.context['user']
+        return UserEducation.objects.create(user=user, **validated_data)
+
+    def update(self, instance, validated_data):
+        user = self.context['user']
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+
+class UserWorkExperienceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserWorkExperience
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        user = self.context['user']
+        return UserWorkExperience.objects.create(user=user, **validated_data)
+
+    def update(self, instance, validated_data):
+        user = self.context['user']
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
