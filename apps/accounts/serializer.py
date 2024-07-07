@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from .models import User, UserEducation, UserWorkExperience, UserSkill, UserWorkSamples, UserRecommendation, \
-    UserLanguage, UserSocialMedia, UserAbout, Partner
+    UserLanguage, UserSocialMedia, UserAbout, Partner, ContactUs
 from apps.utilities import generate_code
 
 
@@ -129,7 +129,6 @@ class UserEducationSerializer(serializers.ModelSerializer):
         return UserEducation.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -149,7 +148,6 @@ class UserWorkExperienceSerializer(serializers.ModelSerializer):
         return UserWorkExperience.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -169,7 +167,6 @@ class UserSkillSerializer(serializers.ModelSerializer):
         return UserSkill.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -189,7 +186,6 @@ class UserWorkSamplesSerializer(serializers.ModelSerializer):
         return UserWorkSamples.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -209,7 +205,6 @@ class UserRecommendationSerializer(serializers.ModelSerializer):
         return UserRecommendation.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -229,9 +224,8 @@ class UserLanguageSerializer(serializers.ModelSerializer):
         return UserLanguage.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
-            setattr(user, attr, value)
+            setattr(instance, attr, value)
         instance.save()
         return instance
 
@@ -249,9 +243,8 @@ class UserSocialMediaSerializer(serializers.ModelSerializer):
         return UserSocialMedia.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
-            setattr(user, attr, value)
+            setattr(instance, attr, value)
         instance.save()
         return instance
 
@@ -269,7 +262,6 @@ class UserAboutSerializer(serializers.ModelSerializer):
         return UserAbout.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -289,10 +281,36 @@ class UserPartnerSerializer(serializers.ModelSerializer):
         return Partner.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user = self.context['user']
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         return instance
 
-# Partner - About Us
+
+class PartnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Partner
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        user = self.context['user']
+        return Partner.objects.create(user=user, **validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactUs
+        fields = '__all__'
+
+    def create(self, validated_data):
+        return ContactUs.objects.create(**validated_data)

@@ -6,13 +6,13 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from apps.accounts.models import UserEducation, UserWorkExperience, UserSkill, UserWorkSamples, UserRecommendation, \
-    UserLanguage, UserSocialMedia
+    UserLanguage, UserSocialMedia, Partner
 from apps.permission import CheckPermission
 from apps.utilities import response_formatter
 
 from apps.accounts.serializer import UserUpdateSerializer, RegisterSerializer, ActivateUserSerializer, \
     UserEducationSerializer, UserWorkExperienceSerializer, UserSkillSerializer, UserWorkSamplesSerializer, \
-    UserRecommendationSerializer, UserLanguageSerializer, UserSocialMediaSerializer
+    UserRecommendationSerializer, UserLanguageSerializer, UserSocialMediaSerializer, PartnerSerializer
 
 
 class RegisterAPIView(APIView):
@@ -99,7 +99,7 @@ class UpdateUserEducationView(APIView):
             except UserEducation.DoesNotExist:
                 return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'مقطع تحصیلی یافت نشد.'))
 
-            serializer = UserEducationSerializer(instance, data=request.data, context={'user': user})
+            serializer = UserEducationSerializer(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'مقطع تحصیلی بروزشد.'))
@@ -137,10 +137,10 @@ class UpdateUserWorkExperience(APIView):
         if user and user.is_authenticated:
             try:
                 instance = UserWorkExperience.objects.get(pk=pk)
-            except UserEducation.DoesNotExist:
+            except UserWorkExperience.DoesNotExist:
                 return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'سابقه کار یافت نشد.'))
 
-            serializer = UserWorkExperienceSerializer(instance, data=request.data, context={'user': user})
+            serializer = UserWorkExperienceSerializer(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'سابقه کار بروزشد.'))
@@ -180,10 +180,10 @@ class UpdateUserSkillApiView(APIView):
         if user and user.is_authenticated:
             try:
                 instance = UserSkill.objects.get(pk=pk)
-            except UserEducation.DoesNotExist:
+            except UserSkill.DoesNotExist:
                 return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'مهارت یافت نشد.'))
 
-            serializer = UserSkillSerializer(instance, data=request.data, context={'user': user})
+            serializer = UserSkillSerializer(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'مهارت بروزشد.'))
@@ -221,9 +221,9 @@ class UpdateUserWorkSamplesApiView(APIView):
         if user and user.is_authenticated:
             try:
                 instance = UserWorkSamples.objects.get(pk=pk)
-            except UserEducation.DoesNotExist:
+            except UserWorkSamples.DoesNotExist:
                 return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'نمونه کار یافت نشد.'))
-            serializer = UserWorkSamplesSerializer(instance, data=request.data, context={'user': user})
+            serializer = UserWorkSamplesSerializer(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'نمونه کار بروزشد.'))
@@ -261,9 +261,9 @@ class UpdateUserRecommendationApiView(APIView):
         if user and user.is_authenticated:
             try:
                 instance = UserRecommendation.objects.get(pk=pk)
-            except UserEducation.DoesNotExist:
+            except UserRecommendation.DoesNotExist:
                 return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'توصیه نامه یافت نشد.'))
-            serializer = UserRecommendationSerializer(instance, data=request.data, context={'user': user})
+            serializer = UserRecommendationSerializer(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'توصیه نامه بروزشد.'))
@@ -301,9 +301,9 @@ class UpdateUserLanguageApiView(APIView):
         if user and user.is_authenticated:
             try:
                 instance = UserLanguage.objects.get(pk=pk)
-            except UserEducation.DoesNotExist:
+            except UserLanguage.DoesNotExist:
                 return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'مهارت زبان یافت نشد.'))
-            serializer = UserLanguageSerializer(instance, data=request.data, context={'user': user})
+            serializer = UserLanguageSerializer(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'مهارت بروزشد.'))
@@ -341,11 +341,51 @@ class UpdateUserSocialMediaApiView(APIView):
         if user and user.is_authenticated:
             try:
                 instance = UserSocialMedia.objects.get(pk=pk)
-            except UserEducation.DoesNotExist:
+            except UserSocialMedia.DoesNotExist:
                 return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'شبکه اجتماعی یافت نشد.'))
-            serializer = UserSocialMediaSerializer(instance, data=request.data, context={'user': user})
+            serializer = UserSocialMediaSerializer(instance, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'شبکه اجتماعی بروزشد.'))
+            return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
+        return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
+
+
+class AddUserPartnerApiView(APIView):
+    @extend_schema(
+        request=PartnerSerializer,
+        responses={200}
+    )
+    def post(self, request):
+        permission_classes = [IsAuthenticated, CheckPermission]
+        authentication_classes = JWTAuthentication
+        user = request.user
+        if user and user.is_authenticated:
+            serializer = PartnerSerializer(data=request.data, context={'user': user})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'همکار ایجاد شد.'))
+            return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
+        return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
+
+
+class UpdateUserPartnerApiView(APIView):
+    @extend_schema(
+        request=PartnerSerializer,
+        responses={200}
+    )
+    def put(self, request, pk):
+        permission_classes = [IsAuthenticated, CheckPermission]
+        authentication_classes = JWTAuthentication
+        user = request.user
+        if user and user.is_authenticated:
+            try:
+                instance = Partner.objects.get(pk=pk)
+            except Partner.DoesNotExist:
+                return Response(response_formatter(None, status.HTTP_404_NOT_FOUND, 'همکار یافت نشد.'))
+            serializer = PartnerSerializer(instance, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'همکار بروزشد.'))
             return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
