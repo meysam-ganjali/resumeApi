@@ -25,4 +25,5 @@ urlpatterns = [
     path('social-media/<int:pk>/', views.UpdateUserSocialMediaApiView.as_view(), name='user-social-media-update'),
     path('partner/', views.AddUserPartnerApiView.as_view(), name='user-partner-create'),
     path('partner/<int:pk>/', views.UpdateUserPartnerApiView.as_view(), name='user-partner-update'),
+    path('contact-us/', views.AddContactUsApiView.as_view(), name='contact-us'),
 ]

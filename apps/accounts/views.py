@@ -12,7 +12,8 @@ from apps.utilities import response_formatter
 
 from apps.accounts.serializer import UserUpdateSerializer, RegisterSerializer, ActivateUserSerializer, \
     UserEducationSerializer, UserWorkExperienceSerializer, UserSkillSerializer, UserWorkSamplesSerializer, \
-    UserRecommendationSerializer, UserLanguageSerializer, UserSocialMediaSerializer, PartnerSerializer
+    UserRecommendationSerializer, UserLanguageSerializer, UserSocialMediaSerializer, PartnerSerializer, \
+    ContactUsSerializer
 
 
 class RegisterAPIView(APIView):
@@ -389,3 +390,17 @@ class UpdateUserPartnerApiView(APIView):
                 return Response(response_formatter(serializer.data, status.HTTP_200_OK, 'همکار بروزشد.'))
             return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))
         return Response(response_formatter(None, status.HTTP_403_FORBIDDEN, 'لطفا وارد حساب کاربری خود شوید.'))
+
+
+class AddContactUsApiView(APIView):
+    @extend_schema(
+        request=ContactUsSerializer,
+        responses={200}
+    )
+    def post(self, request):
+        serializer = ContactUsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(response_formatter(serializer.data, status.HTTP_200_OK,
+                                               'درخواست شما ثبت شد. منتظر تماس همکاران ما باشید . با تشکر.'))
+        return Response(response_formatter(serializer.errors, status.HTTP_400_BAD_REQUEST, 'خطاهای اعتبارسنجی'))

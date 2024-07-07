@@ -307,7 +307,7 @@ class PartnerSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ContactSerializer(serializers.ModelSerializer):
+class ContactUsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactUs
         fields = '__all__'

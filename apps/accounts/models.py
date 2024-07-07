@@ -251,7 +251,7 @@ class UserAbout(models.Model):
 class ContactUs(models.Model):
     full_name = models.CharField(max_length=500, verbose_name='نام . نام خانوادگی')
     phone_number = models.CharField(max_length=15, verbose_name='شماره تلفن همراه')
-    request_text = models.TextField(verbose_name='متن درخواست')
+    request_text = RichTextField(config_name='special',verbose_name='متن درخواست')
     date = jmodels.jDateField(default=jdatetime.date.today(), verbose_name='تاریخ درخواست')
 
     def __str__(self):
